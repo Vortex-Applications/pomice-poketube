@@ -1,9 +1,9 @@
 """
-Pomice
+Pomice (PokeTube)
 ~~~~~~
-The modern Lavalink wrapper designed for discord.py.
+The modern Lavalink wrapper designed for discord.py, retrofitted with PokeTube support.
 
-Copyright (c) 2023, cloudwithax
+Copyright (c) 2023, cloudwithax dba Vortex Applications.
 
 Licensed under GPL-3.0
 """
@@ -20,11 +20,11 @@ if not discord.version_info.major >= 2:
         "using 'pip install discord.py'",
     )
 
-__version__ = "2.7.0"
-__title__ = "pomice"
+__version__ = "2.7.1"
+__title__ = "pomice-poketube"
 __author__ = "cloudwithax"
 __license__ = "GPL-3.0"
-__copyright__ = "Copyright (c) 2023, cloudwithax"
+__copyright__ = "Copyright (c) 2023, cloudwithax dba Vortex Applications."
 
 from .enums import *
 from .events import *

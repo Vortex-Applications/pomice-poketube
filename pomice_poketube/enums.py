@@ -21,18 +21,15 @@ class SearchType(Enum):
     This feature is exclusively for the Spotify search feature of Pomice.
     If you are not using this feature, this class is not necessary.
 
-    SearchType.ytsearch searches using regular Youtube,
+    SearchType.ptsearch searches using PokeTube,
     which is best for all scenarios.
 
-    SearchType.ytmsearch searches using YouTube Music,
-    which is best for getting audio-only results.
 
     SearchType.scsearch searches using SoundCloud,
     which is an alternative to YouTube or YouTube Music.
     """
 
-    ytsearch = "ytsearch"
-    ytmsearch = "ytmsearch"
+    ptsearch = "ptsearch"
     scsearch = "scsearch"
 
     def __str__(self) -> str:
@@ -43,7 +40,7 @@ class TrackType(Enum):
     """
     The enum for the different track types for Pomice.
 
-    TrackType.YOUTUBE defines that the track is from YouTube
+    TrackType.POKETUBE defines that the track is from PokeTube
 
     TrackType.SOUNDCLOUD defines that the track is from SoundCloud.
 
@@ -57,7 +54,7 @@ class TrackType(Enum):
     """
 
     # We don't have to define anything special for these, since these just serve as flags
-    YOUTUBE = "youtube"
+    POKETUBE = "poketube"
     SOUNDCLOUD = "soundcloud"
     SPOTIFY = "spotify"
     APPLE_MUSIC = "apple_music"
@@ -72,7 +69,7 @@ class PlaylistType(Enum):
     """
     The enum for the different playlist types for Pomice.
 
-    PlaylistType.YOUTUBE defines that the playlist is from YouTube
+    PlaylistType.POKETUBE defines that the playlist is from PokeTube
 
     PlaylistType.SOUNDCLOUD defines that the playlist is from SoundCloud.
 
@@ -82,7 +79,7 @@ class PlaylistType(Enum):
     """
 
     # We don't have to define anything special for these, since these just serve as flags
-    YOUTUBE = "youtube"
+    POKETUBE = "poketube"
     SOUNDCLOUD = "soundcloud"
     SPOTIFY = "spotify"
     APPLE_MUSIC = "apple_music"
@@ -185,11 +182,11 @@ class URLRegex:
 
     URLRegex.DISCORD_MP3_URL returns the Discord MP3 URL Regex.
 
-    URLRegex.YOUTUBE_URL returns the Youtube URL Regex.
+    URLRegex.YOUTUBE_URL returns the YouTube URL Regex.
 
-    URLRegex.YOUTUBE_PLAYLIST returns the Youtube Playlist Regex.
+    URLRegex.POKETUBE_URL returns the PokeTube URL Regex.
 
-    URLRegex.YOUTUBE_TIMESTAMP returns the Youtube Timestamp Regex.
+    URLRegex.POKETUBE_PLAYLIST_URL returns the PokeTube Playlist URL Regex.
 
     URLRegex.AM_URL returns the Apple Music URL Regex.
 
@@ -213,13 +210,15 @@ class URLRegex:
         r"(\/(?:[\w\-]+\?v=|embed\/|v\/)?)([\w\-]+)(\S+)?$",
     )
 
-    YOUTUBE_PLAYLIST_URL = re.compile(
-        r"^((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube\.com|youtu.be))/playlist\?list=.*",
+    POKETUBE_URL = re.compile(
+        r"^((?:https?:)?\/\/)?((?:www|m)\.)?((?:poketube\.fun))"
+        r"(\/(?:[\w\-]+\?v=|embed\/|v\/)?)([\w\-]+)(\S+)?$",
     )
 
-    YOUTUBE_TIMESTAMP = re.compile(
-        r"(?P<video>^.*?)(\?t|&start)=(?P<time>\d+)?.*",
+    POKETUBE_PLAYLIST_URL = re.compile(
+        r"^((?:https?:)?\/\/)?((?:www|m)\.)?((?:poketube\.fun))/playlist\?list=.*",
     )
+
 
     AM_URL = re.compile(
         r"https?://music.apple.com/(?P<country>[a-zA-Z]{2})/"

@@ -288,10 +288,7 @@ class Player(VoiceProtocol):
         return self.guild.id not in self._node._players
 
     def _adjust_end_time(self) -> Optional[str]:
-        if self._node._version >= LavalinkVersion(3, 7, 5):
-            return None
-
-        return "0"
+        return None
 
     async def _update_state(self, data: dict) -> None:
         state: dict = data.get("state", {})
@@ -386,7 +383,7 @@ class Player(VoiceProtocol):
         query: str,
         *,
         ctx: Optional[commands.Context] = None,
-        search_type: SearchType = SearchType.ytsearch,
+        search_type: SearchType = SearchType.ptsearch,
         filters: Optional[List[Filter]] = None,
     ) -> Optional[Union[List[Track], Playlist]]:
         """Fetches tracks from the node's REST api to parse into Lavalink.
@@ -487,7 +484,7 @@ class Player(VoiceProtocol):
                     # We have to bare raise here because theres no other way to skip this block feasibly
                     raise
                 search = (
-                    await self._node.get_tracks(f"{track._search_type}:{track.isrc}", ctx=track.ctx)
+                    await self._node.get_tracks(f"{track.isrc}", ctx=track.ctx)
                 )[
                     0
                 ]  # type: ignore
@@ -496,7 +493,7 @@ class Player(VoiceProtocol):
                 try:
                     search = (
                         await self._node.get_tracks(
-                            f"{track._search_type}:{track.title} - {track.author}",
+                            f"{track.title} - {track.author}",
                             ctx=track.ctx,
                         )
                     )[

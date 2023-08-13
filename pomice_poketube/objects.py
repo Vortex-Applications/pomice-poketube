@@ -30,7 +30,6 @@ class Track:
         "info",
         "track_type",
         "filters",
-        "timestamp",
         "original",
         "_search_type",
         "playlist",
@@ -46,6 +45,7 @@ class Track:
         "is_stream",
         "is_seekable",
         "position",
+        "stream_url",
     )
 
     def __init__(
@@ -55,18 +55,17 @@ class Track:
         info: dict,
         ctx: Optional[commands.Context] = None,
         track_type: TrackType,
-        search_type: SearchType = SearchType.ytsearch,
+        search_type: SearchType = SearchType.ptsearch,
         filters: Optional[List[Filter]] = None,
-        timestamp: Optional[float] = None,
         requester: Optional[Union[Member, User, ClientUser]] = None,
+        stream_url: Optional[str] = None,
     ):
         self.track_id: str = track_id
         self.info: dict = info
         self.track_type: TrackType = track_type
         self.filters: Optional[List[Filter]] = filters
-        self.timestamp: Optional[float] = timestamp
 
-        if self.track_type == TrackType.SPOTIFY or self.track_type == TrackType.APPLE_MUSIC:
+        if self.track_type in (TrackType.SPOTIFY, TrackType.APPLE_MUSIC, TrackType.POKETUBE):
             self.original: Optional[Track] = None
         else:
             self.original = self
@@ -81,13 +80,11 @@ class Track:
         self.isrc: Optional[str] = info.get("isrc", None)
         self.thumbnail: Optional[str] = info.get("thumbnail")
 
-        if self.uri and self.track_type is TrackType.YOUTUBE:
-            self.thumbnail = f"https://img.youtube.com/vi/{self.identifier}/mqdefault.jpg"
-
         self.length: int = info.get("length", 0)
         self.is_stream: bool = info.get("isStream", False)
         self.is_seekable: bool = info.get("isSeekable", False)
         self.position: int = info.get("position", 0)
+        self.stream_url: Optional[str] = stream_url
 
         self.ctx: Optional[commands.Context] = ctx
         self.requester: Optional[Union[Member, User, ClientUser]] = requester

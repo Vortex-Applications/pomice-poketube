@@ -294,6 +294,81 @@ class Node:
         if self._apple_music_client:
             await self._apple_music_client._set_session(session=session)
 
+
+    async def _fetch_from_poketube(self, query: str) -> Optional[dict]:
+        if url_match := URLRegex.POKETUBE_URL.match(query):
+            video_id = url_match.group(5)
+            resp = await self._session.request(
+                method="GET",
+                url=f"https://vid.puffyan.us/api/v1/videos/{video_id}",
+                headers={"Accept": "application/json"},
+            )
+
+            if resp.status == 200:
+                data = await resp.json(loads=json.loads)
+                return data
+            else:
+                return None
+            
+        else:
+            resp = await self._session.request(
+                method="GET",
+                url="https://vid.puffyan.us/api/v1/search",
+                params={"q": query},
+                headers={"Accept": "application/json"},
+            )
+
+            if resp.status == 200:
+                results = await resp.text()
+                data = json.loads(results)
+                video_id = None
+                for video in data:
+                    if video["type"] == "video":
+                        video_id = video["videoId"]
+                        break
+                
+                vid_resp = await self._session.request(
+                    method="GET",
+                    url=f"https://vid.puffyan.us/api/v1/videos/{video_id}",
+                    headers={"Accept": "application/json"},
+                )
+                if vid_resp.status == 200:
+                    data = await vid_resp.json(loads=json.loads)
+                    return data     
+                else:
+                    return None   
+            else:
+                return None
+            
+    async def _convert_pt_to_track(
+            self, 
+            results,
+            ctx: Optional[commands.Context] = None,
+            filters: Optional[List[Filter]] = None,
+        ) -> Optional[Track]:
+        if not results:
+            return None
+        
+        data = results
+
+
+        format_url = [adp_format for adp_format in data['adaptiveFormats'] if adp_format["itag"] == "251"][0]["url"]
+        tracks = await self.get_tracks(query=format_url, ctx=ctx, filters=filters)
+        track = tracks[0]
+        # edit track info
+        track.title = data["title"]
+        track.author = data["author"]
+        track.identifier = data["videoId"]
+        track.uri = "https://www.poketube.fun/watch?v=" + data["videoId"]
+        track.is_stream = False
+        track.is_seekable = True
+        track.position = 0
+        track.thumbnail = data["videoThumbnails"][0]["url"]
+
+        return [track]
+
+                
+
     async def _update_handler(self, data: dict) -> None:
         await self._bot.wait_until_ready()
 
@@ -560,7 +635,7 @@ class Node:
         query: str,
         *,
         ctx: Optional[commands.Context] = None,
-        search_type: SearchType = SearchType.ytsearch,
+        search_type: SearchType = SearchType.ptsearch,
         filters: Optional[List[Filter]] = None,
     ) -> Optional[Union[Playlist, List[Track]]]:
         """Fetches tracks from the node's REST api to parse into Lavalink.
@@ -575,11 +650,12 @@ class Node:
         to be applied to your track once it plays.
         """
 
-        timestamp = None
-
         if filters:
             for filter in filters:
                 filter.set_preload()
+
+        if URLRegex.YOUTUBE_URL.match(query):
+            raise NodeRestException("YouTube URLs are not allowed in this method.")
 
         if URLRegex.AM_URL.match(query):
             if not self._apple_music_client:
@@ -767,15 +843,13 @@ class Node:
                     filters=filters,
                 ),
             ]
+        
+
 
         else:
-            if not URLRegex.BASE_URL.match(query) and not re.match(r"(?:ytm?|sc)search:.", query):
-                query = f"{search_type}:{query}"
-
-            # If YouTube url contains a timestamp, capture it for use later.
-
-            if match := URLRegex.YOUTUBE_TIMESTAMP.match(query):
-                timestamp = float(match.group("time"))
+            if not URLRegex.BASE_URL.match(query) or URLRegex.POKETUBE_URL.match(query):
+                results = await self._fetch_from_poketube(query=query)
+                return await self._convert_pt_to_track(results=results, ctx=ctx, filters=filters)
 
             data = await self.send(
                 method="GET",
@@ -824,8 +898,7 @@ class Node:
                     info=track["info"],
                     ctx=ctx,
                     track_type=TrackType(track["info"]["sourceName"]),
-                    filters=filters,
-                    timestamp=timestamp,
+                    filters=filters
                 )
                 for track in data["tracks"]
             ]

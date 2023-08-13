@@ -42,7 +42,7 @@ class PomiceEvent(ABC):
     handler_args: Tuple
 
     def dispatch(self, bot: Client) -> None:
-        bot.dispatch(f"pomice_{self.name}", *self.handler_args)
+        bot.dispatch(f"pomice_poketube_{self.name}", *self.handler_args)
 
 
 class TrackStartEvent(PomiceEvent):

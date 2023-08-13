@@ -5,7 +5,7 @@ import setuptools
 
 version = ""
 requirements = ["aiohttp>=3.7.4,<4", "orjson", "websockets"]
-with open("pomice/__init__.py") as f:
+with open("pomice_poketube/__init__.py") as f:
     version = re.search(
         r'^__version__\s*=\s*[\'"]([^\'"]*)[\'"]',
         f.read(),
@@ -44,13 +44,13 @@ with open("README.md") as f:
     readme = f.read()
 
 setuptools.setup(
-    name="pomice",
+    name="pomice_poketube",
     author="cloudwithax",
     version=version,
-    url="https://github.com/cloudwithax/pomice",
+    url="https://github.com/Vortex-Applications/pomice-poketube",
     packages=setuptools.find_packages(),
     license="GPL",
-    description="The modern Lavalink wrapper designed for Discord.py",
+    description="The modern Lavalink wrapper designed for discord.py, retrofitted with PokeTube support",
     long_description=readme,
     long_description_content_type="text/markdown",
     package_data={"pomice": ["py.typed"]},
